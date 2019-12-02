@@ -1,107 +1,63 @@
-import React from "react";
+import React, { Component } from "react";
 import { MdAddShoppingCart } from "react-icons/md";
+import { connect } from "react-redux";
+
+import api from "../../services/api";
+import { formatPrice } from "../../util/format";
 
 import { ProductList } from "./styles";
 
-export default function Home() {
-  return (
-    <ProductList>
-      <li>
-        <img
-          src="https://static.netshoes.com.br/produtos/tenis-sneaker-meia-leve-calce-facil-vr/06/E74-0492-006/E74-0492-006_zoom1.jpg"
-          alt="Tenis"
-        />
-        <strong>Tenis muito legal</strong>
-        <span>R$129,90</span>
+class Home extends Component {
+  state = {
+    products: []
+  };
 
-        <button>
-          <div>
-            <MdAddShoppingCart size={16} color="#FFF" />
-          </div>
+  async componentDidMount() {
+    const response = await api.get("products");
 
-          <span>ADICIONAR AO CARRINHO</span>
-        </button>
-      </li>
-      <li>
-        <img
-          src="https://static.netshoes.com.br/produtos/tenis-sneaker-meia-leve-calce-facil-vr/06/E74-0492-006/E74-0492-006_zoom1.jpg"
-          alt="Tenis"
-        />
-        <strong>Tenis muito legal</strong>
-        <span>R$129,90</span>
+    const data = response.data.map((product) => ({
+      ...product,
+      priceFormatted: formatPrice(product.price)
+    }));
 
-        <button>
-          <div>
-            <MdAddShoppingCart size={16} color="#FFF" />
-          </div>
+    this.setState({ products: data });
+  }
 
-          <span>ADICIONAR AO CARRINHO</span>
-        </button>
-      </li>
-      <li>
-        <img
-          src="https://static.netshoes.com.br/produtos/tenis-sneaker-meia-leve-calce-facil-vr/06/E74-0492-006/E74-0492-006_zoom1.jpg"
-          alt="Tenis"
-        />
-        <strong>Tenis muito legal</strong>
-        <span>R$129,90</span>
+  handleAddProduct = (product) => {
+    const { dispatch } = this.props;
 
-        <button>
-          <div>
-            <MdAddShoppingCart size={16} color="#FFF" />
-          </div>
+    dispatch({
+      type: "ADD_TO_CART",
+      product
+    });
+  };
 
-          <span>ADICIONAR AO CARRINHO</span>
-        </button>
-      </li>
-      <li>
-        <img
-          src="https://static.netshoes.com.br/produtos/tenis-sneaker-meia-leve-calce-facil-vr/06/E74-0492-006/E74-0492-006_zoom1.jpg"
-          alt="Tenis"
-        />
-        <strong>Tenis muito legal</strong>
-        <span>R$129,90</span>
+  render() {
+    const { products } = this.state;
 
-        <button>
-          <div>
-            <MdAddShoppingCart size={16} color="#FFF" />
-          </div>
+    return (
+      <ProductList>
+        {products.map((product) => (
+          <li key={product.id}>
+            <img src={product.image} alt="Tenis" />
+            <strong>{product.title}</strong>
+            <span>{product.priceFormatted}</span>
 
-          <span>ADICIONAR AO CARRINHO</span>
-        </button>
-      </li>
-      <li>
-        <img
-          src="https://static.netshoes.com.br/produtos/tenis-sneaker-meia-leve-calce-facil-vr/06/E74-0492-006/E74-0492-006_zoom1.jpg"
-          alt="Tenis"
-        />
-        <strong>Tenis muito legal</strong>
-        <span>R$129,90</span>
+            <button
+              type="button"
+              onClick={() => this.handleAddProduct(product)}
+            >
+              <div>
+                <MdAddShoppingCart size={16} color="#FFF" /> 3
+              </div>
 
-        <button>
-          <div>
-            <MdAddShoppingCart size={16} color="#FFF" />
-          </div>
-
-          <span>ADICIONAR AO CARRINHO</span>
-        </button>
-      </li>
-      <li>
-        <img
-          src="https://static.netshoes.com.br/produtos/tenis-sneaker-meia-leve-calce-facil-vr/06/E74-0492-006/E74-0492-006_zoom1.jpg"
-          alt="Tenis"
-        />
-        <strong>Tenis muito legal</strong>
-        <span>R$129,90</span>
-
-        <button>
-          <div>
-            <MdAddShoppingCart size={16} color="#FFF" /> 3
-          </div>
-
-          <span>ADICIONAR AO CARRINHO</span>
-        </button>
-      </li>
-    </ProductList>
-  );
+              <span>ADICIONAR AO CARRINHO</span>
+            </button>
+          </li>
+        ))}
+      </ProductList>
+    );
+  }
 }
+
+export default connect()(Home);
